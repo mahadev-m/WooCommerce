@@ -1,65 +1,93 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import "tailwindcss/tailwind.css";
+import React, { useContext } from "react";
+import { ShopContext } from "../context/shop";
 
-export default function Home() {
+export default function Home({ posts }) {
+  const contextData = useContext(ShopContext);
+
+  console.log({ posts });
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <div>
+      {posts.products.nodes.map((post) => {
+        return (
+          <div className=" w-full  md:flex md:flex-wrap md:p-2 ">
+            <div
+              className="lg:w-1/4 md:w-1/2 w-5/6 lg:h-1/4 m-auto mb-6 border-2
+          lg:m-10 sm:w-3/4 text-center border-gray-100 overflow-hidden shadow-xl
+          hover:shadow-md "
+            >
+              <ul>
+                <li>{post.name}</li>
+                <img src={post.image.sourceUrl} alt="product image" />
+                <h3>{post.price}</h3>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
+                <button
+                  className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+                  onClick={() => {
+                    contextData.addProductToCart(post);
+                  }}
+                >
+                  Add To Cart
+                </button>
+              </ul>
+            </div>
+          </div>
+        );
+      })}
     </div>
-  )
+  );
+}
+
+export async function getStaticProps() {
+  const res = await fetch("http://ecart.local/graphql", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      query: `
+  query MyQuery {
+  products(first: 10) {
+    nodes {
+      id
+      link
+      image {
+        sourceUrl
+      }
+      description
+      slug
+      ... on VariableProduct {
+        id
+        name
+        price
+      }
+      ... on ExternalProduct {
+        id
+        name
+        price
+      }
+      ... on GroupProduct {
+        id
+        name
+        
+      }
+      ... on SimpleProduct {
+        id
+        name
+        price
+      }
+    }
+  }
+}
+
+
+`,
+    }),
+  });
+
+  const json = await res.json();
+
+  return {
+    props: {
+      posts: json.data,
+    },
+  };
 }

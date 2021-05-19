@@ -7,30 +7,28 @@ export default function Home({ posts }) {
 
   console.log({ posts });
   return (
-    <div>
+    <div className="flex flex-wrap ">
       {posts.products.nodes.map((post) => {
         return (
-          <div className=" w-full  md:flex md:flex-wrap md:p-2 ">
-            <div
-              className="lg:w-1/4 md:w-1/2 w-5/6 lg:h-1/4 m-auto mb-6 border-2
+          <div
+            className="lg:w-1/4 md:w-1/2 w-5/6 lg:h-1/4 m-auto mb-6 border-2
           lg:m-10 sm:w-3/4 text-center border-gray-100 overflow-hidden shadow-xl
           hover:shadow-md "
-            >
-              <ul>
-                <li>{post.name}</li>
-                <img src={post.image.sourceUrl} alt="product image" />
-                <h3>{post.price}</h3>
+          >
+            <ul>
+              <li>{post.name}</li>
+              <img src={post.image.sourceUrl} alt="product image" />
+              <h3>{post.price}</h3>
 
-                <button
-                  className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
-                  onClick={() => {
-                    contextData.addProductToCart(post);
-                  }}
-                >
-                  Add To Cart
-                </button>
-              </ul>
-            </div>
+              <button
+                className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+                onClick={() => {
+                  contextData.addProductToCart(post);
+                }}
+              >
+                Add To Cart
+              </button>
+            </ul>
           </div>
         );
       })}
